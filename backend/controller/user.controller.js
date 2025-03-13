@@ -53,3 +53,14 @@ export const getuserprofile=async(req,res)=>{
            console.log(req.user);
            res.status(200).json({message:"Profile fetched successfully",user:req.user});
 }
+export const logoutcontroller=async(req,res)=>{
+    try{
+        const token=req.cookies.token || req.headers.authorization.split(" ")[1];
+        redisClient.set(token,'logout','EX',60*60*24);
+        res.status(200).json({message:"Logged out successfully"});
+    }
+    catch(err){
+        console.log(err);
+        res.status(400).json({error:err.message});
+    }
+}
