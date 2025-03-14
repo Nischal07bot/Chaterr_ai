@@ -66,3 +66,18 @@ export const logoutcontroller=async(req,res)=>{
         res.status(400).json({error:err.message});
     }
 }
+export const getdashboard = async (req, res) => {
+    try {
+        console.log(req.user);
+        const token = req.cookies.token || (req.headers.authorization ? req.headers.authorization.split(" ")[1] : null);
+
+        if (!token) {
+            return res.status(401).json({ error: "Unauthorized, token missing" });
+        }
+
+        res.status(200).json({ user: req.user, token: token });
+    } catch (err) {
+        console.error("Error in getdashboard:", err);
+        res.status(500).json({ error: err.message });
+    }
+};

@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom"; // ❌ Removed BrowserRouter
 import Login from "../Screens/login.jsx";
 import Register from "../Screens/register.jsx";
 import Home from "../Screens/home.jsx";
-
+import Dashboard from "../Screens/dashboard.jsx";
 const AppRoutes = () => {
   return (
     <Routes>

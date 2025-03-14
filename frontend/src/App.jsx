@@ -1,15 +1,18 @@
 import React from "react";
 import "./index.css";
-<index className="css"></index>
 import { BrowserRouter } from "react-router-dom";
-import AppRoutes from "./routes/AppRoutes";
+import AppRoutes from "./routes/AppRoutes.jsx";
 import { UserProvider } from "./context/user.context";
-
+import { Routes, Route } from "react-router-dom";
+import Dashboard from "./Screens/dashboard.jsx";
 const App = () => {
   return (
     <UserProvider>
       <BrowserRouter> {/* ✅ Only one BrowserRouter */}
-        <AppRoutes />
+      <Routes>
+      <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+      <AppRoutes />
       </BrowserRouter>
     </UserProvider>
   );
