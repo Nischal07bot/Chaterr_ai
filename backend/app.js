@@ -7,6 +7,7 @@ import connect from './db/db.js';
 import userRoutes from "./routes/user.routes.js";
 import cookieParser from "cookie-parser";
 import redisClient from "./Services/redis.service.js";
+import projectRoutes from "./routes/projects.routes.js";
 connect();
 const app=express();
 app.use(express.json());//parsing json bodies in the request
@@ -18,6 +19,7 @@ app.use(cors());//allows to make requests from different origins
 app.use(morgan("dev"));//logging middleware
 app.use(cookieParser());
 app.use("/users",userRoutes);
+app.use("/projects",projectRoutes);
 app.get("/",(req,res)=>{
     res.send("Hello World");
 })
