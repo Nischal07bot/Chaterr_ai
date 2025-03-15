@@ -11,7 +11,7 @@ const projectSchema = new mongoose.Schema({
     },
     users:[{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+        ref:'user'
     }]
 });
 const Project=mongoose.model('Project',projectSchema);

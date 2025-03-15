@@ -81,3 +81,13 @@ export const getdashboard = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+export const getallusers=async(req,res)=>{
+    try{
+        const loggedInUser=await usermodel.findOne({email:req.user.email});
+        const users=await userService.getAllusers({userId:loggedInUser._id});
+        res.status(200).json({users:users});
+    }
+    catch(err){
+        res.status(500).json({error:err.message});
+    }
+};

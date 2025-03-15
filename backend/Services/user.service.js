@@ -14,3 +14,9 @@ export const createUser=async ({
     return user;
 }
 
+export const getAllusers=async({userId})=>{
+    const users=await usermodel.find({
+        _id:{$ne:userId}
+    });
+    return users;
+}

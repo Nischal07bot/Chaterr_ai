@@ -8,6 +8,7 @@ import userRoutes from "./routes/user.routes.js";
 import cookieParser from "cookie-parser";
 import redisClient from "./Services/redis.service.js";
 import projectRoutes from "./routes/projects.routes.js";
+import "remixicon/fonts/remixicon.css";
 connect();
 const app=express();
 app.use(express.json());//parsing json bodies in the request
