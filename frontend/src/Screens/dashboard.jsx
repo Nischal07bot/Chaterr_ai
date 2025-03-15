@@ -2,12 +2,14 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../config/axios.js';
 import { UserContext } from '../context/user.context.jsx';
+import "remixicon/fonts/remixicon.css";
+
 
 const Dashboard = () => {
    
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [projectName, setProjectName] = useState(null);
-    const [projects, setProjects] = useState([]);
+    const [project, setProject] = useState([]);
     const navigate = useNavigate();
     const { user } = useContext(UserContext);
     const { setUser } = useContext(UserContext)
@@ -30,7 +32,14 @@ function createProject(e) {
             console.log(error)
         })
 }
-  
+ useEffect(() => { 
+    axios.get("/projects/all").then((res) => {
+        console.log(res.data);
+        setProject(res.data.projects);
+    }).catch((err) => {        
+        console.log(err.response.data);
+    })
+ }, [])
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient-x">
             <div className="bg-white/80 backdrop-blur-sm p-8 rounded-lg shadow-lg w-180 animate-fade-in text-center">
@@ -42,10 +51,31 @@ function createProject(e) {
                             <div className="projects flex flex-wrap gap-3">
                                 <button
                                     onClick={() => setIsModalOpen(true)}
-                                    className="project p-4 border border-slate-300 rounded-md">
+                                    className="project p-4 border border-slate-300 rounded-md cursor-pointer hover:bg-slate-200">
                                     New Project
                                     <i className="ri-link ml-2"></i>
                                 </button>
+                                {
+                    project.map((project) => (
+                        <div key={project._id}
+                            onClick={() => {
+                                navigate(`/project`, {
+                                    state: { project }
+                                })
+                            }}
+                            className="project flex flex-col gap-2 cursor-pointer p-4 border border-slate-300 rounded-md min-w-52 hover:bg-slate-200">
+                            <h2
+                                className='font-semibold'
+                            >{project.name}</h2>
+
+                            <div className="flex gap-2">
+                                <p> <small> <i className="ri-user-line"></i> Collaborators</small> :</p>
+                                {project.users.length}
+                            </div>
+
+                        </div>
+                    ))
+                }
                             </div>
                             {isModalOpen && (
                                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

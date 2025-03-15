@@ -5,6 +5,8 @@ import AppRoutes from "./routes/AppRoutes.jsx";
 import { UserProvider } from "./context/user.context";
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./Screens/dashboard.jsx";
+import "remixicon/fonts/remixicon.css";
+
 const App = () => {
   return (
     <UserProvider>
