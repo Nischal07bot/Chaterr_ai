@@ -4,15 +4,22 @@ dotenv.config();
 import app from "./app.js";
 import {Server} from "socket.io";
 import jwt from "jsonwebtoken";
+import mongoose from    "mongoose";
+import projectModel from "./models/project.model.js";
 const port=process.env.PORT || 3000//or operator used as a fallback option
 const server=http.createServer(app);//creating server her since it can work with both http and websockets since it 
 //uses the tcp persistent connection which app.listen() does not handle 
 const io = new Server(server,{cors:{origin:"*"}});
 
 
-io.use((socket,next)=>{
+io.use(async (socket,next)=>{
     try{
         const token=socket.handshake.auth?.token || socket.handshake.headers.authorization?.split(" ")[1];
+        const projectId=socket.handshake.query.projectId;
+        if(!mongoose.Types.ObjectId.isValid(projectId)){
+            return next(new Error("Invalid ProjectId"));
+        }
+        socket.project=await projectModel.findById(projectId);
         if(!token){
            return next(new Error("Token not found"));
         }
@@ -28,9 +35,15 @@ io.use((socket,next)=>{
 })
 
 io.on('connection', socket => {
-    console.log('a user connected');//jb ek user connect hota hai server se to ye message print hota hai
-  socket.on('event', data => { /* … */ });
-  socket.on('disconnect', () => { /* … */ });
+    socket.roomId = socket.project._id.toString()
+    console.log('a user connected');
+    socket.join(socket.roomId);
+    socket.on('project-message', data => {
+        console.log(data)
+        io.to(socket.roomId).emit('project-message', data)
+    })
+    socket.on('event', data => { /* … */ });
+    socket.on('disconnect', () => { /* … */ });
 });
 
 server.listen(port,()=>{

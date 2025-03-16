@@ -1,7 +1,8 @@
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useContext} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../config/axios";
 import { initializeSocket ,receiveMessage,sendMessage} from "../config/socket";
+import { UserContext } from "../context/user.context";
 const Project = () => {
     const location=useLocation();
     console.log(location.state);
@@ -11,6 +12,9 @@ const Project = () => {
     const [project,setProject]=useState(location.state.project);
     const [users, setUsers] = useState([])
     const [filteredUsers, setFilteredUsers] = useState([]); // Separate filtered users state
+    const [message,setMessage]=useState("");
+    const { user } = useContext(UserContext);
+    const messagBox=React.createRef();
     function addCollaborators(){
         //console.log(selectedUserId);
         axios.put("/projects/adduser",{
@@ -25,7 +29,12 @@ const Project = () => {
         })
     }
     useEffect(()=>{
-        initializeSocket();
+        initializeSocket(project._id);
+
+        receiveMessage("project-message",(data)=>{
+           console.log("hi");
+            console.log(data);
+        })
     },[])
     useEffect(() => {
 
@@ -62,6 +71,16 @@ function newcaollab(){
   setFilteredUsers(filtered); // Store in a separate state
   setIsModalOpen(true);
 }
+const send = () => {
+
+  sendMessage('project-message', {
+      message,
+      sender: user._id
+  })
+ 
+  setMessage("")
+
+}
     return (
         <div>
             <main
@@ -84,7 +103,8 @@ function newcaollab(){
 
            {/* Chat Messages Container */}
             <div className="flex flex-col flex-grow gap-4  overflow-y-auto bg-blue-300 w-full">
-               <div className="incoming flex flex-col p-2 bg-white rounded-md w-fit  max-w-sm mr-4">
+              <div className="messbox">
+              <div className="incoming flex flex-col p-2 bg-white rounded-md w-fit  max-w-sm mr-4">
                 <small className="opacity-65 text-sm">example@gmail.com</small>
                 <p className="text-sm">lorem5 ipsum dolor sit amet consectetur adipisicing elit bbbbbbbbbbbbbbbbbbbbbb.</p>
                </div>
@@ -92,18 +112,23 @@ function newcaollab(){
                 <small className="opacity-65 text-sm">example@gmail.com</small>
                 <p className="text-sm">lorem5 ipsum dolor sit amet consectetur adipisicing elit bbbbbbbbbbbbbbbbbbbbbb.</p>
                </div>
+              </div>
             </div>
   {/* Message Input Bar (Fixed at Bottom) */}
   <div className="sticky bottom-0 w-full p-4 bg-blue-300">
     <div className="flex items-center w-full max-w-lg mx-auto bg-white p-2 rounded-full border border-gray-300 shadow-md">
       {/* Message Input */}
       <input 
+         value={message}
+         onChange={(e) => setMessage(e.target.value)}
         className="flex-grow bg-transparent p-2 outline-none text-gray-700"
         placeholder="Enter your message"
       />
       
       {/* Send Button */}
-      <button className="p-2 bg-blue-500 text-white rounded-full cursor-pointer hover:bg-blue-600 transition duration-300">
+      <button
+      onClick={send} 
+      className="p-2 bg-blue-500 text-white rounded-full cursor-pointer hover:bg-blue-600 transition duration-300">
         <i className="ri-send-plane-fill text-lg"></i>
       </button>
     </div>
