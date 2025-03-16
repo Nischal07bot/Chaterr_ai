@@ -4,6 +4,7 @@ import Login from "../Screens/login.jsx";
 import Register from "../Screens/register.jsx";
 import Home from "../Screens/home.jsx";
 import Dashboard from "../Screens/dashboard.jsx";
+import Project from "../Screens/Project.jsx";
 const AppRoutes = () => {
   return (
     <Routes>
