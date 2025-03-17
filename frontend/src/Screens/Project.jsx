@@ -34,6 +34,7 @@ const Project = () => {
         receiveMessage("project-message",(data)=>{
            console.log("hi");
             console.log(data);
+            appendIncomingMessage(data);
         })
     },[])
     useEffect(() => {
@@ -71,16 +72,43 @@ function newcaollab(){
   setFilteredUsers(filtered); // Store in a separate state
   setIsModalOpen(true);
 }
+function appendIncomingMessage(messageObject) {
+  const messageBox = document.querySelector('.messbox');
+  const incomingMessage = document.createElement('div');
+  incomingMessage.className = 'incoming flex flex-col p-2 bg-white rounded-md w-fit max-w-sm mr-4';
+  incomingMessage.innerHTML = `
+      <small class="opacity-65 text-sm">${messageObject.sender.email}</small>
+      <p class="text-sm">${messageObject.message}</p>
+  `;
+  messageBox.appendChild(incomingMessage);
+  messageBox.scrollTop = messageBox.scrollHeight;
+
+}
+function appendOutgoingMessage(message){
+  const messageBox = document.querySelector('.messbox');
+  const incomingMessage = document.createElement('div');
+  incomingMessage.className = 'ml-auto flex flex-col p-2 bg-gray-400 rounded-md w-fit  max-w-sm gap-2';
+  incomingMessage.innerHTML = `
+      <small class="opacity-65 text-sm">${user.email}</small>
+      <p class="text-sm">${message}</p>
+  `;
+  messageBox.appendChild(incomingMessage);
+  messageBox.scrollTop = messageBox.scrollHeight;
+
+
+}
 const send = () => {
 
   sendMessage('project-message', {
       message,
-      sender: user._id
+      sender: user
   })
+  appendOutgoingMessage(message);
  
   setMessage("")
 
 }
+
     return (
         <div>
             <main
@@ -103,15 +131,8 @@ const send = () => {
 
            {/* Chat Messages Container */}
             <div className="flex flex-col flex-grow gap-4  overflow-y-auto bg-blue-300 w-full">
-              <div className="messbox">
-              <div className="incoming flex flex-col p-2 bg-white rounded-md w-fit  max-w-sm mr-4">
-                <small className="opacity-65 text-sm">example@gmail.com</small>
-                <p className="text-sm">lorem5 ipsum dolor sit amet consectetur adipisicing elit bbbbbbbbbbbbbbbbbbbbbb.</p>
-               </div>
-               <div className="ml-auto flex flex-col p-2 bg-gray-400 rounded-md w-fit  max-w-sm">
-                <small className="opacity-65 text-sm">example@gmail.com</small>
-                <p className="text-sm">lorem5 ipsum dolor sit amet consectetur adipisicing elit bbbbbbbbbbbbbbbbbbbbbb.</p>
-               </div>
+              <div ref={messagBox}className="messbox p-1 flex-grow flex flex-col gap-1">
+              
               </div>
             </div>
   {/* Message Input Bar (Fixed at Bottom) */}

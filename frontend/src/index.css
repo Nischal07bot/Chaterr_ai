@@ -1,1 +1,16 @@
 @import "tailwindcss";
+
+.messbox {
+    overflow-y: auto; /* Allows scrolling */
+    -ms-overflow-style: none; /* Hide scrollbar in IE & Edge */
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+  }
+  
+  .messbox::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome, Safari, Edge */
+  }
+
+  
+.messbox{
+    scroll-behavior:smooth;
+}
