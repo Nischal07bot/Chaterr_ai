@@ -8,7 +8,7 @@ import userRoutes from "./routes/user.routes.js";
 import cookieParser from "cookie-parser";
 import redisClient from "./Services/redis.service.js";
 import projectRoutes from "./routes/projects.routes.js";
-
+import airoutes from "./routes/ai.routes.js";
 connect();
 const app=express();
 app.use(express.json());//parsing json bodies in the request
@@ -24,6 +24,7 @@ app.use("/projects",projectRoutes);
 app.get("/",(req,res)=>{
     res.send("Hello World");
 })
+app.use("/ai",airoutes)
 export default app;
 
 

@@ -3,6 +3,25 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../config/axios";
 import { initializeSocket ,receiveMessage,sendMessage} from "../config/socket";
 import { UserContext } from "../context/user.context";
+import Markdown from "markdown-to-jsx"
+import {useRef} from "react";
+function SyntaxHighlightedCode(props) {
+  const ref = useRef(null)
+
+  React.useEffect(() => {
+      if (ref.current && props.className?.includes('lang-') && window.hljs) {
+          window.hljs.highlightElement(ref.current)
+
+          // hljs won't reprocess the element unless this attribute is removed
+          ref.current.removeAttribute('data-highlighted')
+      }
+  }, [ props.className, props.children ])
+
+  return <code {...props} ref={ref} />
+}
+
+
+
 const Project = () => {
     const location=useLocation();
     console.log(location.state);
@@ -14,6 +33,7 @@ const Project = () => {
     const [filteredUsers, setFilteredUsers] = useState([]); // Separate filtered users state
     const [message,setMessage]=useState("");
     const { user } = useContext(UserContext);
+    const [ messages, setMessages ] = useState([]) // New state variable for messages
     const messagBox=React.createRef();
     function addCollaborators(){
         //console.log(selectedUserId);
@@ -34,7 +54,7 @@ const Project = () => {
         receiveMessage("project-message",(data)=>{
            console.log("hi");
             console.log(data);
-            appendIncomingMessage(data);
+            setMessages(prevMessages => [ ...prevMessages, data ]) // Update messages state
         })
     },[])
     useEffect(() => {
@@ -72,38 +92,14 @@ function newcaollab(){
   setFilteredUsers(filtered); // Store in a separate state
   setIsModalOpen(true);
 }
-function appendIncomingMessage(messageObject) {
-  const messageBox = document.querySelector('.messbox');
-  const incomingMessage = document.createElement('div');
-  incomingMessage.className = 'incoming flex flex-col p-2 bg-white rounded-md w-fit max-w-sm mr-4';
-  incomingMessage.innerHTML = `
-      <small class="opacity-65 text-sm">${messageObject.sender.email}</small>
-      <p class="text-sm">${messageObject.message}</p>
-  `;
-  messageBox.appendChild(incomingMessage);
-  messageBox.scrollTop = messageBox.scrollHeight;
 
-}
-function appendOutgoingMessage(message){
-  const messageBox = document.querySelector('.messbox');
-  const incomingMessage = document.createElement('div');
-  incomingMessage.className = 'ml-auto flex flex-col p-2 bg-gray-400 rounded-md w-fit  max-w-sm gap-2';
-  incomingMessage.innerHTML = `
-      <small class="opacity-65 text-sm">${user.email}</small>
-      <p class="text-sm">${message}</p>
-  `;
-  messageBox.appendChild(incomingMessage);
-  messageBox.scrollTop = messageBox.scrollHeight;
-
-
-}
 const send = () => {
 
   sendMessage('project-message', {
       message,
       sender: user
   })
-  appendOutgoingMessage(message);
+  setMessages(prevMessages => [ ...prevMessages, { sender: user, message } ]) // Update messages state
  
   setMessage("")
 
@@ -133,6 +129,43 @@ const send = () => {
             <div className="flex flex-col flex-grow gap-4  overflow-y-auto bg-blue-300 w-full">
               <div ref={messagBox}className="messbox p-1 flex-grow flex flex-col gap-1">
               
+              {messages.map((msg, index) => {
+    console.log("Sender ID:", msg.sender.email, "User ID:", user.email); // Debugging
+
+    const isCurrentUser = msg.sender.email === user.email;
+
+    return (
+        <div
+            key={index}
+            className={`flex flex-col p-2 rounded-md w-fit max-w-sm ${
+                isCurrentUser
+                    ? "ml-auto bg-gray-400 text-black" // Outgoing message (current user)
+                    : "mr-auto bg-white text-black" // Incoming message (other user)
+            }`}
+        >
+            <small className="opacity-65 text-sm">{msg.sender.email}</small>
+            <p className="text-sm">
+                {msg.sender._id === "ai" ? (
+                    <div className="overflow-auto bg-slate-950 text-white rounded-sm p-2">
+                        <Markdown
+                            children={msg.message}
+                            options={{
+                                overrides: {
+                                    code: SyntaxHighlightedCode,
+                                },
+                            }}
+                        />
+                    </div>
+                ) : (
+                    msg.message
+                )}
+            </p>
+        </div>
+    );
+})}
+
+
+
               </div>
             </div>
   {/* Message Input Bar (Fixed at Bottom) */}

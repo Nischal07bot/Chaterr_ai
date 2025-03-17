@@ -6,6 +6,7 @@ import {Server} from "socket.io";
 import jwt from "jsonwebtoken";
 import mongoose from    "mongoose";
 import projectModel from "./models/project.model.js";
+import { generateResult } from "./Services/gemini.service.js";
 const port=process.env.PORT || 3000//or operator used as a fallback option
 const server=http.createServer(app);//creating server her since it can work with both http and websockets since it 
 //uses the tcp persistent connection which app.listen() does not handle 
@@ -38,8 +39,22 @@ io.on('connection', socket => {
     socket.roomId = socket.project._id.toString()
     console.log('a user connected');
     socket.join(socket.roomId);
-    socket.on('project-message', data => {
+    socket.on('project-message', async (data) => {
         console.log(data)
+        const message=data.message;
+        const aiIspresent=message.includes("@ai");
+        if(aiIspresent)
+        {
+           const prompt=message.replace("@ai","");
+           const result=await generateResult(prompt);
+           io.to(socket.roomId).emit("project-message",{
+            message:result,
+            sender:{
+                _id:"ai",
+                email:"AI"
+            }
+           })
+        }
         socket.broadcast.to(socket.roomId).emit('project-message', data)
     })
     socket.on('event', data => { /* … */ });
