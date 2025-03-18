@@ -104,6 +104,36 @@ const send = () => {
   setMessage("")
 
 }
+function WriteAiMessage(message) {
+    try {
+        const messageObject = JSON.parse(message); // Ensure it's parsed correctly
+        if (messageObject.fileTree) {
+            return (
+                <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
+                    <pre>
+                        <code>{JSON.stringify(messageObject.fileTree, null, 2)}</code>
+                    </pre>
+                </div>
+            );
+        } else {
+            return (
+                <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
+                    <Markdown
+                        children={messageObject.text}
+                        options={{
+                            overrides: {
+                                code: SyntaxHighlightedCode,
+                            },
+                        }}
+                    />
+                </div>
+            );
+        }
+    } catch (error) {
+        console.error("Failed to parse AI message:", error);
+        return <p>{message}</p>; // Return raw message if parsing fails
+    }
+}
 
     return (
         <div>
@@ -146,16 +176,7 @@ const send = () => {
             <small className="opacity-65 text-sm">{msg.sender.email}</small>
             <p className="text-sm">
                 {msg.sender._id === "ai" ? (
-                    <div className="overflow-auto bg-slate-950 text-white rounded-sm p-2">
-                        <Markdown
-                            children={msg.message}
-                            options={{
-                                overrides: {
-                                    code: SyntaxHighlightedCode,
-                                },
-                            }}
-                        />
-                    </div>
+                     WriteAiMessage(msg.message)
                 ) : (
                     msg.message
                 )}
