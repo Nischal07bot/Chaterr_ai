@@ -33,7 +33,22 @@ const Project = () => {
     const [filteredUsers, setFilteredUsers] = useState([]); // Separate filtered users state
     const [message,setMessage]=useState("");
     const { user } = useContext(UserContext);
-    const [ messages, setMessages ] = useState([]) // New state variable for messages
+    const [ messages, setMessages ] = useState([]) ;// New state variable for messages
+    const [currentFile,setcurrentFile]=useState(null);
+    const [ openFiles, setOpenFiles ] = useState([])
+    const [fileTree,setfileTree]=useState({
+        "app.js":{
+            content:`const express=require('express')`
+
+        },
+        "package.json":{
+            content:`{
+            "name":"temp-server",
+        } `
+        }
+
+
+    });
     const messagBox=React.createRef();
     function addCollaborators(){
         //console.log(selectedUserId);
@@ -238,6 +253,62 @@ function WriteAiMessage(message) {
     </div>
   </div>
 </section>
+            <section className="right bg-red-100 flex-grow h-full flex">
+                <div className="explorer h-full max-w-64 min-w-52  bg-slate-200">
+                    <div className="file-tree">
+                       {
+                           Object.keys(fileTree).map((file, index) => (
+                            <button
+                                onClick={() => {
+                                    setcurrentFile(file)
+                                    setOpenFiles([ ...new Set([ ...openFiles, file ]) ])
+                                }}
+                                className="tree-element cursor-pointer p-2 px-4 flex items-center gap-2 bg-slate-300 w-full">
+                                <p
+                                    className='font-semibold text-lg'
+                                >{file}</p>
+                            </button>))
+                       }
+                    </div>
+                </div>
+                {currentFile && (
+                    <div className="code-editor flex flex-col flex-grow h-full">
+
+                        <div className="top flex">
+                            {
+                                openFiles.map((file, index) => (
+                                    <button
+                                        onClick={() => setcurrentFile(file)}
+                                        className={`open-file cursor-pointer p-2 px-4 flex items-center w-fit gap-2 bg-slate-300 ${currentFile === file ? 'bg-slate-400' : ''}`}>
+                                        <p
+                                            className='font-semibold text-lg'
+                                        >{file}</p>
+                                    </button>
+                                ))
+                            }
+                        </div>
+                        <div className="bottom flex flex-grow">
+                            {
+                                fileTree[ currentFile ] && (
+                                    <textarea
+                                        value={fileTree[ currentFile ].content}
+                                        onChange={(e) => {
+                                            setfileTree({
+                                                ...fileTree,
+                                                [ currentFile ]: {
+                                                    content: e.target.value
+                                                }
+                                            })
+                                        }}
+                                        className='w-full h-full p-4 bg-slate-50 outline-none border-none'
+                                    ></textarea>
+                                )
+                            }
+                        </div>
+
+                    </div>
+                )}
+            </section>
             </main>
             {isModalOpen && (
     <div className="fixed inset-0 flex items-center justify-center">
@@ -303,3 +374,7 @@ function WriteAiMessage(message) {
     );
 }
 export default Project; 
+
+{/*<div className="treeelement cursor-pointer px-4 p-2 flex items-center gap-2 bg-slate-300 w-full">
+                        <p className="font-semibold cursor-pointer text-lg">app.js</p>
+                    </div> */}
