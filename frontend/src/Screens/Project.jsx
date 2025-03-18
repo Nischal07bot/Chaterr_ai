@@ -37,17 +37,6 @@ const Project = () => {
     const [currentFile,setcurrentFile]=useState(null);
     const [ openFiles, setOpenFiles ] = useState([])
     const [fileTree,setfileTree]=useState({
-        "app.js":{
-            content:`const express=require('express')`
-
-        },
-        "package.json":{
-            content:`{
-            "name":"temp-server",
-        } `
-        }
-
-
     });
     const messagBox=React.createRef();
     function addCollaborators(){
@@ -68,7 +57,12 @@ const Project = () => {
 
         receiveMessage("project-message",(data)=>{
            console.log("hi");
-            console.log(data);
+            console.log(JSON.parse(data.message));
+            const message = JSON.parse(data.message)
+            if(message.fileTree)
+            {
+                setfileTree(message.fileTree);
+            }
             setMessages(prevMessages => [ ...prevMessages, data ]) // Update messages state
         })
     },[])
@@ -120,35 +114,24 @@ const send = () => {
 
 }
 function WriteAiMessage(message) {
-    try {
-        const messageObject = JSON.parse(message); // Ensure it's parsed correctly
-        if (messageObject.fileTree) {
-            return (
-                <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
-                    <pre>
-                        <code>{JSON.stringify(messageObject.fileTree, null, 2)}</code>
-                    </pre>
-                </div>
-            );
-        } else {
-            return (
-                <div className='overflow-auto bg-slate-950 text-white rounded-sm p-2'>
-                    <Markdown
-                        children={messageObject.text}
-                        options={{
-                            overrides: {
-                                code: SyntaxHighlightedCode,
-                            },
-                        }}
-                    />
-                </div>
-            );
-        }
-    } catch (error) {
-        console.error("Failed to parse AI message:", error);
-        return <p>{message}</p>; // Return raw message if parsing fails
-    }
+
+    const messageObject = JSON.parse(message)
+
+    return (
+        <div
+            className='overflow-auto bg-slate-950 text-white rounded-sm p-2'
+        >
+            <Markdown
+                children={messageObject.text}
+                options={{
+                    overrides: {
+                        code: SyntaxHighlightedCode,
+                    },
+                }}
+            />
+        </div>)
 }
+
 
     return (
         <div>
@@ -375,6 +358,3 @@ function WriteAiMessage(message) {
 }
 export default Project; 
 
-{/*<div className="treeelement cursor-pointer px-4 p-2 flex items-center gap-2 bg-slate-300 w-full">
-                        <p className="font-semibold cursor-pointer text-lg">app.js</p>
-                    </div> */}
