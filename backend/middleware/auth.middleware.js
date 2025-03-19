@@ -3,10 +3,6 @@ import redisClient from "../Services/redis.service.js";
 
 export const authmiddleware=async(req,res,next)=>{
     try{
-        console.log( req.headers.authorization.split(" ")[1])
-        if (!req.headers.authorization) {
-            return res.status(401).json({ error: "No authorization header" });
-        }
 
         const token=req.cookies.token || req.headers.authorization.split(" ")[1];
         if(!token)

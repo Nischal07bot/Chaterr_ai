@@ -22,6 +22,11 @@ export const createProject = async (req, res) => {
 };
 export const getAllProjects = async (req, res) => {
     try{
+       console.log(req.user.email);
+       if(!req.user.email)
+       {
+        return res.status(401).json({error:"Unauthorized"});
+       }
        const loggedInuser=await userModel.findOne({email:req.user.email});
 
        const projects=await projectService.getAllProjects(loggedInuser._id);
