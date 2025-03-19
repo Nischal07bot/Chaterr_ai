@@ -6,7 +6,6 @@ node_modules/
 logs/
 *.log
 # Build output
-dist/
 build/
 # Temporary files
 *.tmp
