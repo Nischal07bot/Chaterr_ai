@@ -23,6 +23,7 @@ export const createProject = async (req, res) => {
 export const getAllProjects = async (req, res) => {
     try{
        const loggedInuser=await userModel.findOne({email:req.user.email});
+
        const projects=await projectService.getAllProjects(loggedInuser._id);
        return res.status(200).json({projects:projects});
     }
